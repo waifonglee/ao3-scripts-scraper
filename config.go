@@ -6,4 +6,6 @@ import "time"
 const (
 	REQUEST_DELAY = 5 * time.Second
 	RETRY_TIMEOUT = 300 * time.Second
+	DOWNLOAD_DIR = "downloads"
+	DOMAIN = "archiveofourown.org"
 )

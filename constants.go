@@ -10,6 +10,5 @@ const (
 	//case, path, url, err
 	ERROR_DOWNLOAD = "Download error: %s for %s from %s failed with error: %v\n"
 	ERROR_DIR_CREATION = "Error: download directory creation failed with error: %v\n"
-	DOWNLOAD_DIR = "downloads"
-	DOMAIN = "archiveofourown.org"
+
 )
