@@ -11,7 +11,7 @@ func main() {
 	dirCreationErr := createDirectory(DOWNLOAD_DIR)
 	if dirCreationErr != nil {
 		fmt.Println(dirCreationErr)
-		os.Exit(1)
+		return
 	}
 
 	//parse args
@@ -30,6 +30,6 @@ func main() {
 	downloadErr := downloadFic(downloadUrl, filePath)
 	if downloadErr != nil {
 		fmt.Println(downloadErr)
-		os.Exit(1)
+		return
 	}
 }
