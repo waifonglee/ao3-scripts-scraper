@@ -1,16 +1,35 @@
 package main
 
 import (
-	"flag"
 	"fmt"
-	"io"
-	"net/http"
 	"os"
+	"path/filepath"
 	"time"
-
-	"github.com/gocolly/colly"
 )
 
+func main() {
+	ao3Url, format := parseDownloaderArgs()
+	fmt.Println(ao3Url, format)
+
+	collector := createCollector()
+	downloadDetails := new(DownloadDetails)
+	
+	fetchSingleDownloadDetails(collector, ao3Url, downloadDetails)
+	fmt.Println("download details", downloadDetails)
+	time.Sleep(REQUEST_DELAY)
+	title := replaceSpaceWithUnderscore(downloadDetails.title)
+	fileName := title + "." + format
+	dir := filepath.Join(DOWNLOAD_DIR, fileName)
+	downloadUrl :=  "https://archiveofourown.org" + downloadDetails.getUrlByFormat(format)
+	err := downloadFic(downloadUrl, dir)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+}
+
+
+/*
 type Fanfic struct {
 	id int
 	kudos int
@@ -40,7 +59,12 @@ func main() {
 	})
 
 	c.OnError(func(r *colly.Response, err error) {
-		fmt.Println("Request URL:", r.Request.URL, "failed with response:", r, "\nError:", err)
+		if r.StatusCode == http.StatusTooManyRequests {
+			time.Sleep(300 * time.Second)
+			r.Request.Retry()
+		} else {
+			fmt.Println("Request URL:", r.Request.URL, "failed with response:", r, "\nError:", err)
+		}
 	})
 
 	c.OnHTML("li.download", func(e *colly.HTMLElement) {
@@ -59,10 +83,11 @@ func main() {
 	c.OnHTML("div.work", func(e *colly.HTMLElement) {
 		fmt.Println("hello3")
 	})
-*/
+
 	c.Visit(url)
 
 }
+
 
 func downloadFile(fileType string, fileUrl string) {
 	fmt.Println(fileUrl)
@@ -87,15 +112,4 @@ func downloadFile(fileType string, fileUrl string) {
 	}
 }
 
-func parseArgs() string {
-	var url string
-	flag.StringVar(&url, "url", "", "URL of fanfic to download")
-	flag.Parse()
-	if len(url) == 0 {
-		flag.PrintDefaults()
-	}
-
-	fmt.Printf("Url: %s \n", url)
-	
-	return url
-}
+*/
