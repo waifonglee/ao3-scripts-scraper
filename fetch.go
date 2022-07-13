@@ -23,7 +23,6 @@ func createCollector() *colly.Collector {
 }
 
 func fetchSingleDownloadDetails(c *colly.Collector, ao3Url string, downloadDetails *DownloadDetails) {
-
 	c.OnRequest(func(req *colly.Request) {
 		fmt.Printf(INFO_VISITING, req.URL.String())
 	})

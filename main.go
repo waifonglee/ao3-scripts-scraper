@@ -8,6 +8,12 @@ import (
 )
 
 func main() {
+	dirCreationErr := createDirectory(DOWNLOAD_DIR)
+	if dirCreationErr != nil {
+		fmt.Println(dirCreationErr)
+		os.Exit(1)
+	}
+
 	ao3Url, format := parseDownloaderArgs()
 	fmt.Println(ao3Url, format)
 
@@ -21,9 +27,9 @@ func main() {
 	fileName := title + "." + format
 	dir := filepath.Join(DOWNLOAD_DIR, fileName)
 	downloadUrl :=  "https://archiveofourown.org" + downloadDetails.getUrlByFormat(format)
-	err := downloadFic(downloadUrl, dir)
-	if err != nil {
-		fmt.Println(err)
+	downloadErr := downloadFic(downloadUrl, dir)
+	if downloadErr != nil {
+		fmt.Println(downloadErr)
 		os.Exit(1)
 	}
 }
