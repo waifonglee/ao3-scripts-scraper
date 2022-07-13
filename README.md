@@ -1,1 +1,1 @@
-started this project to practice Golang
+will be updated soon
