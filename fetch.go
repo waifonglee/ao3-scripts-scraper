@@ -10,11 +10,11 @@ import (
 
 func createCollector() *colly.Collector {
 	c := colly.NewCollector(
-		colly.AllowedDomains("archiveofourown.org"),
+		colly.AllowedDomains(DOMAIN),
 	)
 	c.Limit(&colly.LimitRule{
 		// Filter domains affected by this rule
-		DomainGlob:  "archiveofourown.org/*",
+		DomainGlob: fmt.Sprintf("%s/*", DOMAIN),
 		// Set a delay between requests to these domains
 		Delay: REQUEST_DELAY,
 	})
@@ -34,7 +34,7 @@ func fetchSingleDownloadDetails(c *colly.Collector, ao3Url string, downloadDetai
 			resp.Request.Retry()
 		} else {
 			fetchError := &FetchError{url: resp.Request.URL.String(), statusCode: resp.StatusCode, err: err}
-			panic(fetchError)
+			panic(fetchError) //Not sure if its a good idea to panic here but IDK man
 		}
 	})
 

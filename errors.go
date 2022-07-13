@@ -15,10 +15,10 @@ func (e *FetchError) Error() string {
 type DownloadError struct {
 	step string
 	url string
-	dir string
+	path string
 	err error
 }
 
 func (e *DownloadError) Error() string {
-	return fmt.Sprintf(ERROR_DOWNLOAD, e.step, e.dir, e.url, e.err)
+	return fmt.Sprintf(ERROR_DOWNLOAD, e.step, e.path, e.url, e.err)
 }

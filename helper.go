@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -17,4 +18,9 @@ func createDirectory(path string) error {
 		return errors.New(fmt.Sprintf(ERROR_DIR_CREATION, err))
 	}
 	return nil
+}
+
+func formatPath(title string, format string) string {
+	fileName := fmt.Sprintf("%s.%s", replaceSpaceWithUnderscore(title), format)
+	return filepath.Join(DOWNLOAD_DIR, fileName)
 }

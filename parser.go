@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-func parseDownloaderArgs() (string, string) {
+func parseDownloadArgs() (string, string) {
 	var url string
 	var format int
 	var formatStr string 
