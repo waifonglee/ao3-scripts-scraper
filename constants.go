@@ -2,11 +2,12 @@ package main
 
 
 const (
-	INFO_VISITING = "Visiting %s\n"
-	INFO_TOO_MANY_REQ = "Too many requests. Going to sleep."
-	INFO_INVALID_ARGS = "Invalid arguments. Please refer to usage below."
+	//time, url
+	INFO_VISITING = "%s: Visiting %s\n"
+	INFO_TOO_MANY_REQ = "%s: Too many requests. Going to sleep.\n"
+	INFO_INVALID_ARGS = "Invalid arguments. Please refer to usage below.\n"
 
-	ERROR_INVALID_ARGS = "Invalid arguments"
+	ERROR_INVALID_ARGS = "Invalid arguments\n"
 	//url, statuscode, err
 	ERROR_FETCH = "Fetch error: request for %s failed with status %d and error: %v\n"
 	//case, path, url, err
