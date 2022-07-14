@@ -12,3 +12,4 @@ func (download *DownloadDetails) getUrlByFormat(format string) string {
 
 
 
+

@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"time"
 )
 
@@ -15,7 +14,10 @@ func main() {
 	}
 
 	//parse args
-	ao3Url, format := parseDownloadArgs()
+	ao3Url, format, parseErr := parseDownloadArgs()
+	if parseErr != nil {
+		return
+	}
 
 	//create collector & download details struct
 	collector := createCollector()
@@ -27,7 +29,7 @@ func main() {
 	filePath := formatPath(downloadDetails.title, format)
 	downloadUrl := fmt.Sprintf("https://%s%s", DOMAIN, downloadDetails.getUrlByFormat(format))
 	
-	downloadErr := downloadFic(downloadUrl, filePath)
+	downloadErr := downloadSingleFic(downloadUrl, filePath)
 	if downloadErr != nil {
 		fmt.Println(downloadErr)
 		return

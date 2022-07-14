@@ -8,7 +8,7 @@ import (
 	"os"
 )
 
-func downloadFic(url string, path string) error {
+func downloadSingleFic(url string, path string) error {
 	fic, err := os.Create(path)
 	if err != nil {
 		downloadErr := &DownloadError{step: "file creation", url: url, path: path, err: err}

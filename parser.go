@@ -1,22 +1,24 @@
 package main
 
 import (
+	"errors"
 	"flag"
-	"os"
+	"fmt"
 )
 
-func parseDownloadArgs() (string, string) {
+func parseDownloadArgs() (string, string, error) {
 	var url string
 	var format int
 	var formatStr string 
 	
 	flag.StringVar(&url, "url", "", "URL of fanfic to download")
-	flag.IntVar(&format, "format", 0, "Format of download file\n0: pdf\n1: html\n2: mobi\n3: epub\n4:azw3\ndefault: pdf")
+	flag.IntVar(&format, "format", 0, "Format of download file\n0: pdf\n1: html\n2: mobi\n3: epub\n4: azw3\ndefault: pdf")
 	flag.Parse()
-	
+	//check if url is valid e.g from page or from fic
 	if len(url) == 0 || format > 4 || format < 0 {
+		fmt.Println(INFO_INVALID_ARGS)
 		flag.PrintDefaults()
-		os.Exit(1)
+		return "", "", errors.New(ERROR_INVALID_ARGS)
 	}
 	
 	switch format {
@@ -32,5 +34,5 @@ func parseDownloadArgs() (string, string) {
 		formatStr = "azw"	
 	}
 
-	return url, formatStr
+	return url, formatStr, nil
 }
