@@ -12,15 +12,8 @@ func (d *DownloadDetails) resetTitleLink() {
 }
 
 type PageDetails struct {
-	endPage int
+	end int
 }
-
-
-/*
-func (download *DownloadDetails) getUrlByFormat(format string) string {
-	return download.urls[format]
-}
-*/
 
 
 

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 )
 
 func main() {
@@ -13,12 +14,22 @@ func main() {
 	}
 
 	//parse args
-	ao3Url, format, parseErr := parseDownloadArgs()
+	values, parseErr := parseCommand()
 	if parseErr != nil {
 		return
 	}
-	fmt.Println("url", ao3Url, "format", format, "endpage")
-	downloadWorkFromLink(ao3Url, format)
+
+	fmt.Println("parse values", values)
+	
+	
+	switch values["urlType"] {
+	case "0":
+		downloadWorkFromLink(values["url"], values["format"])
+	case "1":
+		end, _ := strconv.Atoi(values["end"])
+		downloadWorksFromLink(values["url"], end, values["format"])
+	}
+	
 }
 
 /*
