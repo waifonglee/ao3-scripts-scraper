@@ -6,6 +6,7 @@ const (
 	INFO_VISITING = "%s: Visiting %s\n"
 	INFO_TOO_MANY_REQ = "%s: Too many requests. Going to sleep.\n"
 	INFO_INVALID_ARGS = "Invalid arguments. Please refer to usage below.\n"
+	INFO_DOWNLOADING = "%s: Starting download from %s\n"
 
 	ERROR_INVALID_ARGS = "Invalid arguments\n"
 	//url, statuscode, err

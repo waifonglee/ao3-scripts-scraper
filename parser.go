@@ -16,7 +16,7 @@ func parseDownloadArgs() (string, string, error) {
 	flag.Parse()
 	//check if url is valid e.g from page or from fic
 	if len(url) == 0 || format > 4 || format < 0 {
-		fmt.Println(INFO_INVALID_ARGS)
+		fmt.Printf(INFO_INVALID_ARGS)
 		flag.PrintDefaults()
 		return "", "", errors.New(ERROR_INVALID_ARGS)
 	}
@@ -50,7 +50,7 @@ func parseDownloadArgsTwo() (string, string, int, error) {
 	//check if url is valid e.g from page or from fic
 	if len(url) == 0 || format > 4 || format < 0 || endpage < 0 {
 		fmt.Println(endpage)
-		fmt.Println(INFO_INVALID_ARGS)
+		fmt.Printf(INFO_INVALID_ARGS)
 		flag.PrintDefaults()
 		return "", "", -1, errors.New(ERROR_INVALID_ARGS)
 	}

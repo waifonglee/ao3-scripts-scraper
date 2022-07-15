@@ -15,6 +15,30 @@ var workCollector *colly.Collector
 var pageDetails *PageDetails
 var downloadDetails *DownloadDetails
 
+
+func setDownloadDetails(format string) {
+	downloadDetails = &DownloadDetails{format: format}
+
+}
+
+func setPageDetails(endPage int) {
+	pageDetails = &PageDetails{endPage: endPage}
+}
+
+func downloadWorkFromLink(link string, format string) {
+	setDownloadDetails(format)
+	setCollectorForSingleDownload()
+	workCollector.Visit(link)
+}
+
+func downloadWorksFromLink(link string, endPage int, format string) {
+	setPageDetails(endPage)
+	setDownloadDetails(format)
+	setCollectorForPages()
+	setCollectorForSingleDownload()
+	worksCollector.Visit(link)
+}
+
 func createCollector() *colly.Collector {
 	c := colly.NewCollector(
 		colly.AllowedDomains(DOMAIN),
@@ -23,7 +47,7 @@ func createCollector() *colly.Collector {
 	)
 	c.Limit(&colly.LimitRule{
 		// Filter domains affected by this rule
-		DomainGlob: fmt.Sprintf("%s/*", DOMAIN),
+		DomainGlob: "*",
 		// Set a delay between requests to these domains
 		Delay: REQUEST_DELAY,
 	})
@@ -33,6 +57,10 @@ func createCollector() *colly.Collector {
 
 func onReq(req *colly.Request) {
 	fmt.Printf(INFO_VISITING, time.Now().String(), req.URL.String())
+}
+
+func onResp(resp *colly.Response) {
+	fmt.Println("Response code", resp.StatusCode)
 }
 
 func onErr(resp *colly.Response, err error) {
@@ -51,15 +79,28 @@ func setDownloadLinkFromWork(e *colly.HTMLElement) {
 		if downloadDetails.format != strings.ToLower(strings.TrimSpace(child.Text)) {
 			return
 		}
-		downloadDetails.link = e.Request.AbsoluteURL(child.Attr("href"))
+		downloadDetails.downloadLink = e.Request.AbsoluteURL(child.Attr("href"))
 	})
 }
 
 func setTitleFromWork(e *colly.HTMLElement) {
-	downloadDetails.format = strings.TrimSpace(e.Text)
+	downloadDetails.title = strings.TrimSpace(e.Text)
 }
 
-func setDownloadCollector() {
+func downloadWorkAfterFetch(resp *colly.Response) {
+	time.Sleep(REQUEST_DELAY)
+	fmt.Println("download details", downloadDetails)
+	fmt.Printf(INFO_DOWNLOADING, time.Now().String(), resp.Request.URL)
+	downloadErr := downloadSingleWork(downloadDetails)
+	downloadDetails.resetTitleLink()
+	if downloadErr != nil {
+		fmt.Println(downloadErr)
+		return
+	}
+	time.Sleep(REQUEST_DELAY)
+}
+
+func setCollectorForSingleDownload() {
 	if worksCollector != nil {
 		workCollector = worksCollector.Clone()
 	} else {
@@ -67,77 +108,54 @@ func setDownloadCollector() {
 	} 
 
 	workCollector.OnRequest(onReq)
+	workCollector.OnResponse(onResp)
 	workCollector.OnError(onErr)
 	workCollector.OnHTML("li.download", setDownloadLinkFromWork)
 	workCollector.OnHTML("h2.title.heading", setTitleFromWork)
+	workCollector.OnScraped(downloadWorkAfterFetch)
 }
 
-func setPageCollector() {
+func goNextPage(e *colly.HTMLElement) {
+	//Pagination on top and bottom in ao3, only collect from one
+	if e.Index > 0 {
+		return
+	}
+
+	currentPage, err := strconv.Atoi(e.ChildText("span.current"))
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("current page", currentPage)
+
+	if currentPage == pageDetails.endPage {
+		return
+	}
+
+	nextPageLink :=  e.Request.AbsoluteURL(e.ChildAttr("[rel='next']", "href"))
+	//check if its the final page
+	if len(nextPageLink) == 0 {
+		return
+	}
+	fmt.Println("nextpage:", nextPageLink)
+	//time.Sleep(REQUEST_DELAY)
+	e.Request.Visit(nextPageLink)
+}
+
+// Not quite sure about this function name, can't think of anything better yet
+func fetchWork(e *colly.HTMLElement) { 
+	link := e.Request.AbsoluteURL(e.ChildAttr("a[href^='/works/']", "href")) + "?view_adult=true"
+	fmt.Println("work link", link)
+	workCollector.Visit(link)
+}
+
+func setCollectorForPages() {
 	worksCollector = createCollector()
-	workCollector.OnRequest(onReq)
-	workCollector.OnError(onErr)
-}
-func setmainCollector(endPage int) {
-	mainCollector = createCollector()
-	mainCollector.OnRequest(func(req *colly.Request) {
-		fmt.Printf(INFO_VISITING, req.URL.String())
-	})
 
-	mainCollector.OnError(func(resp *colly.Response, err error) {
-		if resp.StatusCode == http.StatusTooManyRequests {
-			fmt.Println(INFO_TOO_MANY_REQ)
-			time.Sleep(RETRY_TIMEOUT)
-			resp.Request.Retry()
-		} else {
-			fetchError := &FetchError{url: resp.Request.URL.String(), statusCode: resp.StatusCode, err: err}
-			panic(fetchError) //Not sure if its a good idea to panic here but IDK man
-		}
-	})
-
-	mainCollector.OnHTML("ol.pagination.actions", func (e *colly.HTMLElement) {
-		if e.Index > 0 {
-			return
-		}
-
-		currentPage, err := strconv.Atoi(e.ChildText("span.current"))
-		if err != nil {
-			panic(err)
-		}
-		fmt.Println("current page", currentPage)
-
-		if currentPage == endPage {
-			return
-		}
-
-		nextPageUrl :=  e.Request.AbsoluteURL(e.ChildAttr("[rel='next']", "href"))
-		if len(nextPageUrl) == 0 {
-			return
-		}
-		time.Sleep(REQUEST_DELAY)
-		e.Request.Visit(nextPageUrl)
-	})
-
-	mainCollector.OnHTML("li[role='article']", func (e *colly.HTMLElement) {
-			link:=e.Request.AbsoluteURL(e.ChildAttr("a[href^='/works/']", "href"))
-			fmt.Println(link)
-
-			//downloadDetails := new(DownloadDetails)
-			
-			
-			//fetchSingleDownloadDetailss(dlCollector)
-			dlCollector.Visit(link)
-			//fmt.Println(downloadDetails)
-
-			/*
-			filePath := formatPath(downloadDetails.title, "pdf")
-			downloadUrl := fmt.Sprintf("https://%s%s", DOMAIN, downloadDetails.getUrlByFormat("pdf"))
-			downloadErr := downloadSingleFic(downloadUrl, filePath)
-			if downloadErr != nil {
-				fmt.Println(downloadErr)
-				return
-			}
-			
-	})
+	worksCollector.OnRequest(onReq)
+	worksCollector.OnResponse(onResp)
+	worksCollector.OnError(onErr)
+	worksCollector.OnHTML("ol.pagination.actions", goNextPage)
+	worksCollector.OnHTML("li[role='article']", fetchWork)
 }
 
 /*

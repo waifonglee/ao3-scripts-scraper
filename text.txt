@@ -1,1 +1,1 @@
-go run *.go -url "https://archiveofourown.org/tags/Sanada%20Shunpei*s*Sawamura%20Eijun/works"   
+go run *.go -url "https://archiveofourown.org/works/40299801/chapters/100943388"

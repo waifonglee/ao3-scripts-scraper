@@ -3,12 +3,16 @@ package main
 type DownloadDetails struct {
 	title string
 	format string
-	link string
+	downloadLink string
+}
+
+func (d *DownloadDetails) resetTitleLink() {
+	d.title = ""
+	d.downloadLink = ""
 }
 
 type PageDetails struct {
-	link string
-	lastPage int
+	endPage int
 }
 
 
@@ -17,7 +21,6 @@ func (download *DownloadDetails) getUrlByFormat(format string) string {
 	return download.urls[format]
 }
 */
-
 
 
 
