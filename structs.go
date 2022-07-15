@@ -2,14 +2,18 @@ package main
 
 type DownloadDetails struct {
 	title string
-	urls map[string]string
+	format string
+	downloadLink string
 }
 
-// fileType must be in upper case
-func (download *DownloadDetails) getUrlByFormat(format string) string {
-	return download.urls[format]
+func (d *DownloadDetails) resetTitleLink() {
+	d.title = ""
+	d.downloadLink = ""
 }
 
+type PageDetails struct {
+	end int
+}
 
 
 
